@@ -95,54 +95,127 @@ SHOW CREATE TABLE address;
 
 
 -- Use JOIN to display the first and last names, as well as the address, of each staff member. Use the tables staff and address
-
-
+select first_name, last_name, address
+from staff s
+inner join address a
+using (address_id);
 
 -- Use JOIN to display the total amount rung up by each staff member in August of 2005. Use tables staff and payment
 
+select first_name, last_name, sum(amount)
+from staff s
+inner join payment p
+using (staff_id)
+where payment_date like "2005-08%"
+group by staff_id;
 
-
+select * from payment limit 10;
 -- List each film and the number of actors who are listed for that film. Use tables film_actor and film. Use inner join.
-
+select title, count(actor_id)
+from film f
+inner join film_actor fa
+using (film_id)
+group by film_id; 
 
 
 -- How many copies of the film Hunchback Impossible exist in the inventory system?
-
+select title, count(i.film_id)
+from film f
+inner join inventory i
+using (film_id)
+where title = "Hunchback Impossible"
+group by film_id;
 
 
 -- Using the tables payment and customer and the JOIN command, list the total paid by each customer. 
 -- List the customers alphabetically by last name.
-
+select first_name, last_name, sum(amount)
+from customer c
+inner join payment p
+using (customer_id)
+group by customer_id
+order by last_name asc;
 
 
 
 -- Use subqueries to display the titles of movies starting with the letters K and Q whose language is English.
+select title
+from film
+where (title like "Q%" or title like "K%") and
+language_id in(
+	select language_id
+    from language
+    where name = "English"
+);
 
 
 
 -- Use subqueries to display all actors who appear in the film Alone Trip.
+select first_name, last_name
+from actor
+where actor_id in
+(
+	select actor_id
+    from film_actor
+    where film_id in
+    (
+		select film_id
+        from film
+        where title = "Alone Trip"
+    )
+);
 
-
-
+select * from address limit 10;
 -- You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers. 
 -- Use joins to retrieve this information.
-
+select first_name, last_name, email
+from customer 
+inner join address
+using (address_id)
+inner join city
+using (city_id)
+inner join country
+using (country_id)
+where country = "Canada";
 
 
 -- Identify all movies categorized as family films.
+select title
+from film
+where film_id in
+(
+	select film_id
+    from film_category
+    where category_id in
+    (
+		select category_id
+        from category
+        where name = "Family"
+    )
+);
 
-
-
+select * from inventory limit 10;
 -- Display the most frequently rented movies in descending order.
+select title, count(i.film_id)
+from film f
+inner join inventory i
+using (film_id)
+group by title
+order by count(i.film_id) desc;
 
 
 
 -- Write a query to display how much business, in dollars, each store brought in.
-
-
+-- since only ones taff member seems to work at each store, this is equivalent to the total amount they have each rung up.
+select store_id, sum(amount)
+from staff s
+inner join payment p
+using (staff_id)
+group by staff_id;
+select * from staff;
 
 -- Write a query to display for each store its store ID, city, and country.
-
+select store_id, city, country
 
 
 -- List the top five genres in gross revenue in descending order. 
